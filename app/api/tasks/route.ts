@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+// import prisma from "@/lib/prisma";
+import { PrismaClient } from "@/app/generated/prisma";
 import redis from "@/lib/redis";
 import { publisher, TASK_UPDATE_CHANNEL } from "@/lib/pubsub";
 const CACHE_KEY = "tasks:all";
 const CACHE_EXPIRY = 60;
+const prisma = new PrismaClient();
 
 export async function GET() {
   try {
