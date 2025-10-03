@@ -1,8 +1,6 @@
-// app/page.tsx
 import TaskForm from '@/components/TaskForm';
 import TaskList from '@/components/TaskList';
 
-// This is a modern Next.js Server Component
 export default function Home() {
   return (
     <main className="min-h-screen p-8 bg-gray-50">
@@ -11,12 +9,10 @@ export default function Home() {
       </h1>
       
       <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
-        {/* Left Column: Form */}
         <div className="md:w-1/3">
           <TaskForm />
         </div>
         
-        {/* Right Column: Task List */}
         <div className="md:w-2/3">
           <TaskList />
         </div>

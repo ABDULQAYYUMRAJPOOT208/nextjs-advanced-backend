@@ -1,65 +1,61 @@
-// components/TaskList.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { socket } from '@/utils/scoket';
+import { socket } from '@/utils/scoket'; 
 import { Task, TaskUpdateMessage } from '@/types/task';
 
 export default function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Function to Fetch Data (Caches/DB)
   const fetchTasks = useCallback(async () => {
     setIsLoading(true);
     try {
-      // This call hits our Caching API route (GET /api/tasks)
       const response = await axios.get<Task[]>('/api/tasks');
       setTasks(response.data);
     } catch (error) {
       console.error('Error fetching tasks:', error);
+      setTasks([]); 
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // 2. Initial Data Load
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
-  // 3. WebSocket Listener (Real-Time Updates)
   useEffect(() => {
     const handleTaskUpdate = (message: TaskUpdateMessage) => {
       console.log('Real-Time Update Received:', message);
       
-      // Update state without a full page refresh
       if (message.type === 'TASK_CREATED') {
-        setTasks(prev => [message.task, ...prev.filter(t => t.id !== message.task.id)]);
+        setTasks(prev => {
+          if (prev.some(task => task.id === message.task.id)) {
+            return prev;
+          }
+          return [message.task, ...prev];
+        });
       }
-      // Future: Handle TASK_COMPLETED updates here
     };
 
     socket.on('taskUpdated', handleTaskUpdate);
 
-    // Cleanup: Essential for avoiding memory leaks
     return () => {
       socket.off('taskUpdated', handleTaskUpdate);
     };
-  }, []); // Run once on mount
+  }, []); 
 
-  // 4. Task Completion Handler (Triggers Worker Queue)
   const handleComplete = async (id: string) => {
     try {
-      // This call hits our Asynchronous Worker API route
       await axios.post(`/api/tasks/${id}/complete`);
       alert('Task completion triggered! Check worker console for 3-second email simulation.');
       
-      // Update UI optimistically (optional)
       setTasks(prev => prev.map(t => t.id === id ? { ...t, isCompleted: true } : t));
     } catch (error) {
       console.error('Failed to complete task:', error);
+      // fetchTasks(); 
     }
   };
 

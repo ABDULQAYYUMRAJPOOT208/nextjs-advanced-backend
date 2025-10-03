@@ -1,4 +1,3 @@
-// components/TaskForm.tsx
 'use client';
 
 import axios from 'axios';
@@ -8,7 +7,6 @@ import { z } from 'zod';
 import { Task } from '@/types/task';
 import { useState } from 'react';
 
-// 1. Zod Schema: Defines the structure and validation rules
 const taskSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters.'),
   description: z.string().optional(),
@@ -19,19 +17,18 @@ type TaskFormData = z.infer<typeof taskSchema>;
 export default function TaskForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, formState: { errors }, reset } = useForm<TaskFormData>({
-    resolver: zodResolver(taskSchema), // Connects Zod to React Hook Form
+    resolver: zodResolver(taskSchema),
   });
 
   const onSubmit = async (data: TaskFormData) => {
     setIsSubmitting(true);
     try {
-      // 2. API Call (POST /api/tasks)
       const response = await axios.post<Task>('/api/tasks', data);
       
       console.log('Task created successfully:', response.data);
       alert('Task Created! Check the console for the backend Pub/Sub notification.');
       
-      reset(); // Reset form on success
+      reset();
       
     } catch (error) {
       console.error('Failed to create task:', error);
@@ -45,7 +42,6 @@ export default function TaskForm() {
     <div className="p-6 bg-white shadow-lg rounded-xl max-w-lg w-full">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Add New Task</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Title Input */}
         <div>
           <input
             {...register('title')}
@@ -59,7 +55,6 @@ export default function TaskForm() {
           )}
         </div>
         
-        {/* Description Input */}
         <div>
           <textarea
             {...register('description')}
@@ -69,7 +64,6 @@ export default function TaskForm() {
           />
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}

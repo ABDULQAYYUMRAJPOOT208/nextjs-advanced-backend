@@ -1,12 +1,9 @@
-// utils/socket.ts
 import { io } from 'socket.io-client';
 
-// Define the URL for our dedicated WebSocket server (running on port 3001)
 const WS_URL = 'http://localhost:3001';
 
-// Create the client instance. This connection persists as long as the app runs.
 export const socket = io(WS_URL, {
-  reconnectionAttempts: 5, // Attempt to reconnect 5 times if connection is lost
+  reconnectionAttempts: 5, 
   timeout: 10000,
 });
 
